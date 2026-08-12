@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Interactive FX risk management concept dashboard inspired by Kantox." />
+  <title>Kantox Demo — FX Risk Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-word">kantox</div>
+        <div class="brand-sub">Tomorrow's FX today</div>
+        <div class="demo-pill">CONCEPT DEMO</div>
+      </div>
+
+      <nav class="nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="Dashboard"><span class="nav-icon">▦</span><span>Dashboard</span></button>
+        <button class="nav-item" data-view="Live Rates"><span class="nav-icon">↕</span><span>Live Rates</span></button>
+        <button class="nav-item" data-view="Transactions"><span class="nav-icon">⇄</span><span>Transactions</span></button>
+        <button class="nav-item" data-view="Orders"><span class="nav-icon">▣</span><span>Orders</span></button>
+        <button class="nav-item" data-view="Exposure"><span class="nav-icon">⌁</span><span>Exposure</span></button>
+        <button class="nav-item" data-view="Hedging"><span class="nav-icon">↕</span><span>Hedging</span></button>
+        <button class="nav-item" data-view="Analytics"><span class="nav-icon">▥</span><span>Analytics</span></button>
+        <button class="nav-item" data-view="Payments"><span class="nav-icon">▤</span><span>Payments</span></button>
+        <button class="nav-item" data-view="Counterparties"><span class="nav-icon">♙</span><span>Counterparties</span></button>
+        <button class="nav-item" data-view="Reports"><span class="nav-icon">▧</span><span>Reports</span></button>
+        <button class="nav-item" data-view="Automation"><span class="nav-icon">⚙</span><span>Automation</span></button>
+        <button class="nav-item" data-view="Settings"><span class="nav-icon">⚙</span><span>Settings</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="account-manager" id="accountManagerBtn"><span>◉</span><span>Contact your<br/>account manager</span></button>
+        <button class="collapse-btn" id="collapseBtn"><span>←</span><span>Collapse</span></button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">Overview of your FX exposure, risk and transactions</p>
+        </div>
+        <div class="top-actions">
+          <label class="search-box" aria-label="Search dashboard">
+            <input id="globalSearch" type="search" placeholder="Search orders, currencies…" />
+            <span>⌕</span>
+          </label>
+          <button class="icon-btn" id="notificationsBtn" title="Notifications">♧<span class="dot"></span></button>
+          <button class="icon-btn" id="helpBtn" title="Help">?</button>
+          <button class="profile-btn" id="profileBtn">
+            <span><strong>John Smith</strong><small>ACME Corp.</small></span><span>⌄</span>
+          </button>
+        </div>
+      </header>
+
+      <section id="dashboardView" class="dashboard-grid">
+        <div class="metrics-row">
+          <article class="metric-card">
+            <div class="metric-icon blue">⌁</div>
+            <div><span class="metric-label">Total Exposure (EUR)</span><strong id="totalExposure">12,750,000</strong><small><span class="negative">-2.35%</span> vs last 7 days</small></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon teal">◇</div>
+            <div><span class="metric-label">Hedged (EUR)</span><strong id="hedgedAmount">8,550,000</strong><small><span class="positive">+1.18%</span> vs last 7 days</small></div>
+          </article>
+          <article class="metric-card">
+            <div class="donut"><span id="hedgeRatioDonut">67%</span></div>
+            <div><span class="metric-label">Hedge Ratio</span><strong id="hedgeRatio">67%</strong><small><span class="positive">+3pp</span> vs last 7 days</small></div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon pale">⌁</div>
+            <div><span class="metric-label">Potential P&amp;L (EUR)</span><strong id="potentialPnl">125,000</strong><small>vs last 7 days</small></div>
+          </article>
+        </div>
+
+        <div class="content-columns">
+          <div class="content-main">
+            <div class="chart-row">
+              <article class="panel exposure-panel">
+                <div class="panel-header">
+                  <div><h2>Exposure by Currency</h2><span class="info" title="Gross FX exposure by settlement currency">i</span></div>
+                  <select id="exposureUnit" class="select"><option>EUR</option><option>USD</option></select>
+                </div>
+                <div id="exposureBars" class="bar-chart" aria-label="Exposure by currency chart"></div>
+              </article>
+
+              <article class="panel trend-panel">
+                <div class="panel-header">
+                  <div><h2>Exposure Over Time (EUR)</h2><span class="info">i</span></div>
+                  <select id="trendRange" class="select"><option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">YTD</option></select>
+                </div>
+                <div class="trend-chart-wrap">
+                  <svg id="trendChart" viewBox="0 0 720 280" preserveAspectRatio="none" role="img" aria-label="Exposure trend line"></svg>
+                </div>
+              </article>
+            </div>
+
+            <article class="panel orders-panel">
+              <div class="tabs-row">
+                <div class="tabs">
+                  <button class="tab active" data-tab="orders">Open Orders</button>
+                  <button class="tab" data-tab="hedge">Hedge Summary</button>
+                  <button class="tab" data-tab="breakdown">Exposure Breakdown</button>
+                  <button class="tab" data-tab="counterparties">Counterparties</button>
+                </div>
+                <button class="primary-btn compact" id="newOrderBtn">+ New order</button>
+              </div>
+              <div id="ordersTab" class="tab-content active">
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Type</th><th>Currency Pair</th><th>Side</th><th>Amount</th><th>Target Rate</th><th>Expiry</th><th>Status</th><th></th></tr></thead>
+                    <tbody id="ordersBody"></tbody>
+                  </table>
+                </div>
+                <button class="text-link" id="viewAllOrders">View all orders ›</button>
+              </div>
+              <div id="hedgeTab" class="tab-content placeholder-state"></div>
+              <div id="breakdownTab" class="tab-content placeholder-state"></div>
+              <div id="counterpartiesTab" class="tab-content placeholder-state"></div>
+            </article>
+          </div>
+
+          <aside class="right-rail">
+            <article class="panel rates-panel">
+              <div class="panel-header"><div><h2>Live Rates</h2><span class="info">i</span></div><button class="text-link" id="refreshRates">Refresh</button></div>
+              <div class="rates-header"><span></span><span>Sell</span><span>Buy</span></div>
+              <div id="ratesList"></div>
+              <button class="text-link full" id="editRatesBtn">Edit watchlist ›</button>
+            </article>
+
+            <article class="panel transactions-panel">
+              <div class="panel-header"><div><h2>Recent Transactions</h2><span class="info">i</span></div><button class="text-link" id="addTransactionBtn">+ Add</button></div>
+              <div id="transactionsList"></div>
+              <button class="text-link full" id="viewAllTransactions">View all transactions ›</button>
+            </article>
+
+            <article class="panel alerts-panel">
+              <div class="panel-header"><h2>Alerts</h2><button class="text-link" id="clearAlertsBtn">Clear</button></div>
+              <div id="alertsList"></div>
+            </article>
+          </aside>
+        </div>
+
+        <footer class="footer-note">Concept demo. Data is simulated and indicative. <span id="lastUpdated"></span></footer>
+      </section>
+
+      <section id="genericView" class="generic-view hidden">
+        <div class="generic-card">
+          <div class="generic-icon">↗</div>
+          <h2 id="genericTitle">Module</h2>
+          <p id="genericDescription"></p>
+          <button class="primary-btn" id="backDashboardBtn">Back to dashboard</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <dialog id="orderDialog" class="dialog">
+    <form method="dialog" id="orderForm">
+      <div class="dialog-header"><div><h2>Create FX order</h2><p>Add a simulated limit or stop order.</p></div><button type="button" class="close-btn" data-close="orderDialog">×</button></div>
+      <div class="form-grid">
+        <label>Order type<select id="orderType" required><option>Limit</option><option>Stop</option></select></label>
+        <label>Currency pair<select id="orderPair" required><option>EUR / USD</option><option>EUR / GBP</option><option>EUR / JPY</option><option>EUR / CHF</option><option>EUR / CNY</option></select></label>
+        <label>Side<select id="orderSide" required><option>Buy EUR</option><option>Sell EUR</option></select></label>
+        <label>Amount<input id="orderAmount" type="number" min="1000" step="1000" value="500000" required /></label>
+        <label>Target rate<input id="orderRate" type="number" step="0.0001" value="1.0800" required /></label>
+        <label>Expiry<input id="orderExpiry" type="date" required /></label>
+      </div>
+      <div class="dialog-actions"><button type="button" class="secondary-btn" data-close="orderDialog">Cancel</button><button type="submit" class="primary-btn">Create order</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="transactionDialog" class="dialog small-dialog">
+    <form method="dialog" id="transactionForm">
+      <div class="dialog-header"><div><h2>Add transaction</h2><p>Record a simulated executed trade.</p></div><button type="button" class="close-btn" data-close="transactionDialog">×</button></div>
+      <div class="form-grid one-col">
+        <label>Action<select id="txAction"><option>Bought</option><option>Sold</option></select></label>
+        <label>Currency<select id="txCurrency"><option>USD</option><option>GBP</option><option>JPY</option><option>CHF</option><option>CNY</option></select></label>
+        <label>Amount<input id="txAmount" type="number" min="1000" step="1000" value="250000" required /></label>
+        <label>Execution rate<input id="txRate" type="number" step="0.0001" value="1.0875" required /></label>
+      </div>
+      <div class="dialog-actions"><button type="button" class="secondary-btn" data-close="transactionDialog">Cancel</button><button type="submit" class="primary-btn">Add transaction</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="ratesDialog" class="dialog small-dialog">
+    <form method="dialog" id="ratesForm">
+      <div class="dialog-header"><div><h2>Edit live-rate watchlist</h2><p>Select the pairs shown on the dashboard.</p></div><button type="button" class="close-btn" data-close="ratesDialog">×</button></div>
+      <div id="ratesChecklist" class="checklist"></div>
+      <div class="dialog-actions"><button type="button" class="secondary-btn" data-close="ratesDialog">Cancel</button><button type="submit" class="primary-btn">Save watchlist</button></div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
